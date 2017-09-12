@@ -12,6 +12,7 @@
                     <li><a href="#"><img> Secret Revolution 3 </a> </li>
                     @if (Auth::check())
                         <li><a href="#"> {{Auth::user()->firstname}} {{Auth::user()->lastname}}</a></li>
+                        <li><a href="/logout"> Logout </a></li>
                     @endif
                 </ul>
             </div> 

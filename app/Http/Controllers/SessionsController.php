@@ -26,9 +26,6 @@ class SessionsController extends Controller
         // Auth automatically signs in
         if (! auth()->attempt(request(['email', 'password']))) {
             //If not, redirect back
-            echo(email);
-            echo(password);
-            echo('didnt work');
             return back();
         }
         // After login, Redirect to the home page

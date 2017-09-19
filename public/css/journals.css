@@ -1,0 +1,130 @@
+.panel-left {
+  height: 100vh;
+  width: 100%;
+  background: #111;
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: 32px;
+}
+
+.journal-heading-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    height: 30px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.journal-heading {
+    color: white;
+    font-weight: bolder;
+    font-size: 0.8rem;
+    padding-left: 16px;
+    display: inline-block;
+    margin-bottom: 0;
+}
+
+.journals {
+    width: 100%;
+    padding-right: 8px;
+}
+
+
+.journals ul a {
+    display: flex;
+    align-items: center;
+}
+
+.new-journal {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.7);
+}
+
+.new-journal:hover {
+    color: #ff671f;
+}
+
+
+
+.journal-heading-icon {
+    font-size: 0.8rem;
+    padding-right: 8px;
+    margin-bottom: 1px;
+}
+
+.journals ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 16px;
+}
+
+.journals li {
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.journals li.active a{
+    color: #ff671f;
+    font-weight: 400;
+}
+
+.journals li.active::after {
+    background: #ff671f;
+    height: 1px;
+    content:"";
+    width: 100%;
+    position: absolute;
+    bottom: -2px;
+}
+
+.journals li a {
+    color: white;
+    font-weight: 300
+}
+
+.journals li a:hover {
+    color: #ff671f;
+}
+
+
+.logged-in-user {
+    color: white;
+    background: #333;
+    padding: 16px;
+    margin-bottom: 0;
+    width: 100%;
+    margin-top: auto;
+}
+
+.logged-in-user:hover {
+    background: #444;
+    color: white;
+}
+
+.panel-entries {
+    background: #EEE;
+    height: 100%;
+    padding: 16px;
+    padding-top: 32px;
+}
+
+.panel-entries .search-box,
+.panel-entries #date-from,
+.panel-entries #date-upto {
+    background: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    height: 30px;
+    box-shadow: none;
+    border-color: #333;
+}
+
+.panel-entries #hidden,
+.panel-entries #deleted {
+    margin-bottom: 0;
+}
+
+.panel-entries .search-box::placeholder {
+    color: #555;
+}

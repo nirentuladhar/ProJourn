@@ -1,34 +1,66 @@
-@import url(https://fonts.googleapis.com/css?family=Raleway:300,400,600);.panel-journals {
-  height: 100vh;
-  width: 100%;
-  background: #111;
-  padding-left: 8px;
+@import url(https://fonts.googleapis.com/css?family=Lato:300,400,700);
+
+h1, h2, h3, h4, h5, h6, div, p, span, body {
+  font-family: 'Lato', 'Helvetica', sans-serif;
 }
 
-.panel-journals__name {
+/* ERRORS */
+
+.form-group .callout {
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.form-group .callout ul {
   list-style: none;
   margin: 0;
-  padding-top: 64px;
 }
 
-.panel-journals__name a {
-  color: #EEE;
+
+.home-container {
+  background: #21374B;
+  height: 100vh;
 }
 
-.panel-journals__name a:hover {
+.home-wrapper {
+  justify-content: center;
+  padding-top: 128px;
+}
+
+.home-form {
+  background: #FFF;
+  border-radius: 8px;
+  padding: 48px;
+}
+
+.home-form h1 { 
   color: #ff671f;
+  margin-bottom: 32px;
 }
 
-.panel-entries {
-  height: 100vh;
+.home-form .button {
+  background: #ff671f;
   width: 100%;
-  background: #EEE;
+  border-radius: 8px;
+  font-weight: bold;
+  margin-bottom: 32px;
+  margin-top: 16px;
 }
 
-.panel-entry {
-  height: 100vh;
-  width: 100%;
+.home-form input {
+  margin-bottom: 8px;
+  border-radius: 8px;
 }
 
-h1 { color: pink; }
+.home-form .button:hover {
+  background: #DB4200;
+}
 
+.home-form a {
+  color: #ff671f;
+  text-decoration: underline;
+}
+
+.home-form a:hover {
+  color: #DB4200;
+}

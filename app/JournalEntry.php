@@ -19,4 +19,7 @@ class JournalEntry extends Model
         return $this->belongsToMany("App\Keyword");
     }
     
+    public function latestVersions() {
+        return $this->hasMany("App\Version","entry_id")->latest('updated_at');
+    }
 }

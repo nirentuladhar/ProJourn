@@ -9,6 +9,30 @@ class JournalsController extends Controller
     public function __construct() {
         $this->middleware('auth');
     }
+
+    public function store() {
+
+        $this->validate(request(), [
+            'name' => 'required'
+        ]);
+
+        \App\Journal::create([
+            'user_id' => auth()->user()->id,
+            'name' => request('name')
+        ]);
+
+        $x = fetchJournals();
+
+        return ['message' => 'Journal created!'];
+    }
+
+
+    public function fetchJournals() {
+        return auth()->user()->journals;
+    }
+
+
+
     public function index() {
         $user = auth()->user();
         $journals = $user->journals;

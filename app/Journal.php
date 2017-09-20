@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Journal extends Model
 {
     //
+    protected $fillable = [
+        'user_id','name'
+    ];
 
     public function user() {
         return $this->belongsTo("App\User");

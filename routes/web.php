@@ -2,6 +2,13 @@
 
 
 Route::get('/', 'JournalsController@index')->name('home');
+Route::get('api/journals', 'JournalsController@fetchJournals');
+Route::post('api/newJournal', 'JournalsController@store');
+
+
+Route::get('api/journalEntries', 'JournalsController@fetchJournals');
+
+
 
 
 Route::get('/register', 'RegistrationController@create');
@@ -12,9 +19,16 @@ Route::post('/login', 'SessionsController@store');
 
 Route::get('/logout', 'SessionsController@destroy');
 
-// component will make a request to get this
-Route::get('api/journals', function() {
-    return App\Journal::latest()->get();
+
+
+
+
+//PASS JOURNAL ID
+//RETURN ALL JOURNAL ENTRIES->LATEST VERSION ASSOCIATED WITH THE JOURNAL ID
+Route::get('api/journal_entries', function() {
+    $user = auth()->user();
+    $journals = $user->journals;
+    return '';
 });
 
 

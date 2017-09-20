@@ -25,11 +25,9 @@
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/js/foundation.min.js"></script>
-<script src="https://unpkg.com/vue@2.4.4/dist/vue.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.3.4/vue-resource.min.js"></script>
+
 <script src="/js/app.js"></script>
 
-<script>
-    @yield ('vue-script')
-</script>
+
+@yield ('vue-script')
 </html>

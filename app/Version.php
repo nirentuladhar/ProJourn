@@ -10,4 +10,5 @@ class Version extends Model
         return $this->belongsTo("App\JournalEntry", "entry_id");
     }
 
+
 }

@@ -19,11 +19,7 @@
                         </p>
                         <a class="new-journal"> New Journal <i class="fa fa-plus-circle" style="padding-left: 4px" aria-hidden="true"></i></a>
                     </div>
-        
-                    <add-new-journal></add-new-journal>
-
-                    <journal-list></journal-list>
-
+                    <journals></journals>
                 </div>
 
 
@@ -56,9 +52,10 @@
             </form>
 
             <hr>
-            <add-new-journal-entry></add-new-journal-entry>
+            <journal-entries></journal-entries>
+            {{--  <add-new-journal-entry></add-new-journal-entry>  --}}
                 
-            <journal-entry-list></journal-entry-list>
+            {{--  <journal-entry-list></journal-entry-list>  --}}
 {{--  
                 <ul>
                     @foreach ($result as $v)

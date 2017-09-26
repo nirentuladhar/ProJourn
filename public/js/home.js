@@ -1,7 +1,7 @@
 Vue.component('add-new-journal', {
     template: `
-    <form method="GET" @submit.prevent="addJournal">
-        <input type="text" v-model="name">
+    <form method="GET" @submit.prevent="addJournal" class="add-new-journal-container">
+        <input type="text" v-model="name" class="add-new-journal-textbox">
         <button class="button">Add a new journal</button>
     </form>
     `,
@@ -12,21 +12,42 @@ Vue.component('add-new-journal', {
     },
     methods: {
         addJournal: function() {
-            console.log(this.newJournal);
             axios.post('api/newJournal', { name: this.name })
                 .then(response => console.log(response))
-                .catch(function(error) { console.log('FUCK -> ' + error.message) });
+                .catch(function(error) { console.log('JOURNAL -> ' + error.message) });
+            fetchJournals();
+        }
+    }
+})
+
+Vue.component('add-new-journal-entry', {
+    template: `
+    <form method="GET" @submit.prevent="addJournalEntry" class="add-new-journal-container">
+        <input type="text" v-model="name" class="add-new-journal-textbox">
+        <button class="button">Add a new entry</button>
+    </form>
+    `,
+    data: function() {
+        return {
+            name: ''
+        }
+    },
+    methods: {
+        addJournal: function() {
+            axios.post('api/newJournalEntry', { name: this.name })
+                .then(response => console.log(response))
+                .catch(function(error) { console.log('JOURNAL -> ' + error.message) });
         }
     }
 })
 
 
-Vue.component('journal-list', {
+$journalList = Vue.component('journal-list', {
     template: `
     <div id="tasks-template">
         <ul>
             <li v-for="journal in list">
-                <a href="#"><i class="fa fa-file-o journal-heading-icon" aria-hidden="true"></i>
+                <a href="#" @click="console.log('something');"><i class="fa fa-file-o journal-heading-icon" aria-hidden="true"></i>
                     {{ journal.name }}
                 </a>
             </li>
@@ -57,7 +78,7 @@ Vue.component('journal-entry-list', {
     template: `
     <ul>
         <li v-for="journalEntry in journalEntries">
-            <a href="#">{{ journalEntry.name }}</a>
+            <a href="#">{{ journalEntry.title }}</a>
         </li>
     </ul>
     `,
@@ -72,11 +93,17 @@ Vue.component('journal-entry-list', {
     methods: {
         fetchJournalEntries: function() {
             axios.get('api/journalEntries')
-                .then(response => this.journalEntries = response.data);
+                .then(response => this.journalEntries = response.data)
+                // .then(response => console.log(response))
+                .catch(function (error) { console.log('JOURNAL ENTRY -> ' + error.message) });
+            // console.log(this.journalEntries);
         }
     }
-})
+}) 
 
 new Vue({
-    el: '#root'
+    el: '#root', 
+    data: {
+        journalList: ''
+    }
 })

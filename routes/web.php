@@ -4,9 +4,10 @@
 Route::get('/', 'JournalsController@index')->name('home');
 Route::get('api/journals', 'JournalsController@fetchJournals');
 Route::post('api/newJournal', 'JournalsController@store');
+Route::post('api/newJournalEntry', 'JournalsController@store');
 
 
-Route::get('api/journalEntries', 'JournalsController@fetchJournals');
+Route::get('api/journalEntries', 'JournalsController@fetchJournalEntries');
 
 
 

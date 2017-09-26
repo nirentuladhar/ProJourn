@@ -15,20 +15,45 @@ class JournalsController extends Controller
         $this->validate(request(), [
             'name' => 'required'
         ]);
-
         \App\Journal::create([
             'user_id' => auth()->user()->id,
             'name' => request('name')
         ]);
 
-        $x = fetchJournals();
-
         return ['message' => 'Journal created!'];
+    }
+
+    public function storeEntries() {
+
+        $this->validate(request(), [
+
+        ]);
+        \App\JournalEntry::create([
+
+        ]);
+        \App\Version::create([
+
+        ]);
+        return 0;
+
     }
 
 
     public function fetchJournals() {
         return auth()->user()->journals;
+    }
+    
+    public function fetchJournalEntries() {
+
+        $journal_entries = auth()->user()->journals->find(1)->journal_entries;
+        $all_entries = array();
+        foreach($journal_entries as $journal_entry) {
+            foreach($journal_entry->latestVersions as $versions) {
+                array_push($all_entries, $versions);
+                break;
+            }
+        }
+        return $all_entries;
     }
 
 

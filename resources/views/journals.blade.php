@@ -55,22 +55,23 @@
                 <button class="button"> Search </button>
             </form>
 
-                <hr>
+            <hr>
+            <add-new-journal-entry></add-new-journal-entry>
                 
-                <journal-entry-list></journal-entry-list>
-
+            <journal-entry-list></journal-entry-list>
+{{--  
                 <ul>
                     @foreach ($result as $v)
                         <li><a href="#">{{ $v->title }}</a></li>
                     @endforeach
-                </ul>
+                </ul>  --}}
             </div>
         </div>
         <div class="medium-6 large-6 cell">
             <div class="panel-entry">
-                {{ $jev->title }}<br>
-                {{ $jev->body }}<br>
-                {{ $jev->updated_at }}
+                <h1 contenteditable="true">{{ $jev->title }}<br></h1>
+                <h6>{{ $jev->updated_at }}</h6>
+                <p contenteditable="true">{{ $jev->body }}<br></p>
             </div>
         </div>
     </div>

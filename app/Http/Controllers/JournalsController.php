@@ -43,9 +43,8 @@ class JournalsController extends Controller
         return auth()->user()->journals;
     }
     
-    public function fetchJournalEntries() {
-
-        $journal_entries = auth()->user()->journals->find(1)->journal_entries;
+    public function fetchJournalEntries(Request $request) {
+        $journal_entries = auth()->user()->journals->find($request->journal_id)->journal_entries;
         $all_entries = array();
         foreach($journal_entries as $journal_entry) {
             foreach($journal_entry->latestVersions as $versions) {

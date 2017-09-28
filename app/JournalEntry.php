@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class JournalEntry extends Model
 {
     //
+    protected $fillable = [
+        'journal_id', 'hidden', 'deleted' , 'keywords',
+    ];
+
     public function journals() {
         return $this->belongsTo("App\Journal");
     }

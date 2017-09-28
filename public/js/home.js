@@ -1,6 +1,7 @@
 var store = {
     state: {
-        activeJournal: 1
+        activeJournal: 1,
+        journalEntries: []
     }
 };
 
@@ -16,7 +17,7 @@ $journals = Vue.component('journals', {
         <div id="tasks-template">
             <ul>
                 <li v-for="journal in journals">
-                    <a href="#" @click="showID(journal.id)"><i class="fa fa-file-o journal-heading-icon" aria-hidden="true"></i>
+                    <a href="#" @click="onClick(journal.id)"><i class="fa fa-file-o journal-heading-icon" aria-hidden="true"></i>
                         {{ journal.name }}
                     </a>
                 </li>
@@ -24,19 +25,22 @@ $journals = Vue.component('journals', {
         </div>
     </div>
     `,
+    props: {
+        state: { default: [] }
+    },
     data: function() {
         return {
             name: '',
             journals: {
                 id: '',
                 name: ''
-            },
-            activeJournal: store.state.activeJournal
+            }
         }
     },
     created: function() {
         this.fetchJournals();
         console.log(this.activeJournal);
+        this.state.push({activeJournal: 3});
     },
     methods: {
         fetchJournals: function () {
@@ -48,6 +52,12 @@ $journals = Vue.component('journals', {
                 .then(response => console.log(response))
                 .catch(function (error) { console.log('JOURNAL -> ' + error.message) });
             this.fetchJournals();
+        },
+        onClick: function(id) {
+            activeJournal = id;
+            axios.post('api/journalEntries', { journal_id: id})
+                .then(response => this.journalEntries = response.data)
+                .catch(function (error) { console.log('CLICK JOURNAL -> ' + error.message) });
         }
     }
 })
@@ -67,14 +77,18 @@ Vue.component('journal-entries', {
         </ul>
     </div>
     `,
+    props: {
+        state: { default: [] }
+    },
     data: function () {
         return {
             name: '',
-            journalEntries: []
+            activeJournal: store.state.activeJournal,
+            journalEntries: store.state.journalEntries
         }
     },
     created: function () {
-        this.fetchJournalEntries();
+        // this.fetchJournalEntries();
     },
     methods: {
         createJournalEntry: function () {
@@ -82,17 +96,20 @@ Vue.component('journal-entries', {
                 .then(response => console.log(response))
                 .catch(function (error) { console.log('JOURNAL -> ' + error.message) });
         },
-        fetchJournalEntries: function () {
-            axios.get('api/journalEntries')
-                .then(response => this.journalEntries = response.data)
-                // .then(response => console.log(response))
-                .catch(function (error) { console.log('JOURNAL ENTRY -> ' + error.message) });
-            // console.log(this.journalEntries);
-        }
+        // fetchJournalEntries: function () {
+        //     axios.get('api/journalEntries')
+        //         .then(response => this.journalEntries = response.data)
+        //         // .then(response => console.log(response))
+        //         .catch(function (error) { console.log('JOURNAL ENTRY -> ' + error.message) });
+        //     // console.log(this.journalEntries);
+        // }
     }
 })
 
 
 new Vue({
-    el: '#root'
+    el: '#root',
+    data: {
+        activeJournal: 1
+    }
 })

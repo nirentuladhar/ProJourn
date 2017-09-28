@@ -7,7 +7,7 @@ Route::post('api/newJournal', 'JournalsController@store');
 Route::post('api/newJournalEntry', 'JournalsController@store');
 
 
-Route::get('api/journalEntries', 'JournalsController@fetchJournalEntries');
+Route::post('api/journalEntries', 'JournalsController@fetchJournalEntries');
 
 
 

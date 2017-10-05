@@ -8,9 +8,9 @@
 @section('main-content')
 
 
-<div id="root">
+<div id="xyz">
     <div class="grid-x">
-        <div class="medium-3 large-3 cell">
+        <div class="medium-3 large-2 cell">
             <div class="panel-left">
                 <div class="journals">
                     <div class="journal-heading-container">
@@ -34,42 +34,39 @@
         </div>
         <div class="medium-3 large-3 cell">
             <div class="panel-entries">
-            <form>
-                <input type="text" class="search-box" placeholder="Search">
-                <fieldset class="small-12 columns">
-                    <input id="hidden" type="checkbox"><label for="hidden">Hidden</label>
-                    <input id="deleted" type="checkbox"><label for="deleted">Deleted</label>
-                </fieldset>
-                <div class="grid-x grid-margin-x">
-                    <div class="small-6 cell">
-                        <label for="date-from"> Date From </label><input id="date-from" type="date">
+                <form>
+                    <div style="padding-right:8px; padding-left: 8px;">
+                        <input type="text" class="search-box" placeholder="Search">
                     </div>
-                    <div class="small-6 cell">
-                        <label for="date-upto"> Date Upto </label><input id="date-upto" type="date">
+                    <fieldset class="small-12 columns"  style="display: none;">
+                        <input id="hidden" type="checkbox"><label for="hidden">Hidden</label>
+                        <input id="deleted" type="checkbox"><label for="deleted">Deleted</label>
+                    </fieldset>
+                    <div class="grid-x grid-margin-x"  style="display: none;">
+                        <div class="small-6 cell">
+                            <label for="date-from"> Date From </label><input id="date-from" type="date">
+                        </div>
+                        <div class="small-6 cell">
+                            <label for="date-upto"> Date Upto </label><input id="date-upto" type="date">
+                        </div>
                     </div>
-                </div>
-                <button class="button"> Search </button>
-            </form>
-
-            <hr>
+                    <button class="button"  style="display: none;"> Search </button>
+                </form>
+                <hr>
             <journal-entries></journal-entries>
-            {{--  <add-new-journal-entry></add-new-journal-entry>  --}}
-                
-            {{--  <journal-entry-list></journal-entry-list>  --}}
-{{--  
-                <ul>
-                    @foreach ($result as $v)
-                        <li><a href="#">{{ $v->title }}</a></li>
-                    @endforeach
-                </ul>  --}}
+            <hidden-entries></hidden-entries>
+            <deleted-entries></deleted-entries>
             </div>
         </div>
         <div class="medium-6 large-6 cell">
-            <div class="panel-entry">
+            <journal-entry></journal-entry>
+            <versions></versions>
+            
+            {{--  <div class="panel-entry">
                 <h1 contenteditable="true">{{ $jev->title }}<br></h1>
                 <h6>{{ $jev->updated_at }}</h6>
                 <p contenteditable="true">{{ $jev->body }}<br></p>
-            </div>
+            </div>  --}}
         </div>
     </div>
 </div>

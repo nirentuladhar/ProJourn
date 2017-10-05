@@ -104,7 +104,6 @@
 .panel-entries {
     background: #EEE;
     height: 100%;
-    padding: 16px;
     padding-top: 32px;
 }
 
@@ -118,6 +117,7 @@
     box-shadow: none;
     border-color: #333;
 }
+
 
 .panel-entries #hidden,
 .panel-entries #deleted {
@@ -144,4 +144,25 @@
     font-weight: bold;
     padding-left: 20px;
     padding-right: 20px;
+}
+
+.journal-entries-title {
+    list-style: none;
+    margin: 0;
+}
+.journal-entries-title a {
+    color: black;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    display: block;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.journal-entries-title a.dark {
+    background: #DDD;
+}
+.journal-entries-title a:hover {
+    font-weight:bold;
+    background: #CCC;
 }

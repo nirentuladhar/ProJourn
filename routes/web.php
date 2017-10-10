@@ -25,10 +25,15 @@ Route::post('api/deletedEntries', 'JournalsController@fetchDeletedEntries');
 
 // create new records
 Route::post('api/newJournal', 'JournalsController@store');
+Route::post('api/newJournalEntry', 'JournalsController@storeEntries');
 Route::post('api/newJournalEntryVersion', 'JournalsController@storeJournalEntryVersion');
 
 
 // update records
 Route::post('api/toggleHideJournalEntry', 'JournalsController@toggleHideJournalEntry');
 Route::post('api/deleteJournalEntry', 'JournalsController@deleteJournalEntry');
+
+//search records
+Route::post('api/searchAllEntries', 'JournalsController@searchAllEntries');
+
 

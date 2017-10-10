@@ -26,7 +26,9 @@ class SessionsController extends Controller
         // Auth automatically signs in
         if (! auth()->attempt(request(['email', 'password']))) {
             //If not, redirect back
-            return back();
+            return back()->withErrors([
+                'message' => 'Please check your credentials and try again.'
+            ]);
         }
         // After login, Redirect to the home page
         return redirect()->home();

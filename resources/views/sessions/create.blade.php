@@ -19,7 +19,7 @@
                         <label for="password">Password:</label>
                         <input type="password" class="form-control" id="password" name="password" required>
                     </div>
-
+                    @include ('layouts.errors')
                     <div class="form-group">
                         <button type="submit" class="button">Sign in</button>
                     </div>

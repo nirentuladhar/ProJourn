@@ -10,8 +10,9 @@ class JournalsController extends Controller
         $this->middleware('auth');
     }
 
+    // Gets values from the user through a request 
+    // Creates a new journal
     public function store() {
-
         $this->validate(request(), [
             'name' => 'required'
         ]);
@@ -19,11 +20,15 @@ class JournalsController extends Controller
             'user_id' => auth()->user()->id,
             'name' => request('name')
         ]);
-
         return ['message' => 'Journal created!'];
     }
 
+    // Gets values from the user through a request 
+    // Creates a new version for a journal entry
     public function storeJournalEntryVersion() {
+        $this->validate(request(), [
+            'title' => 'required'
+        ]);
         \App\Version::create([
             'entry_id' => request('entry_id'),
             'title' => request('title'),
@@ -32,18 +37,27 @@ class JournalsController extends Controller
         return ['message' => 'Entry version created!'];
     }
 
+    // Gets values from the user through a request 
+    // Creates a new journal entry
     public function storeEntries() {
-
         $this->validate(request(), [
-
-        ]);
-        \App\JournalEntry::create([
-
-        ]);
+            'journal_id' => 'required',
+            'title' => 'required'
+        ]);   
+        // Create a new entry record
+        $journalentry = new \App\JournalEntry();
+        $journalentry->journal_id = request('journal_id');
+        $journalentry->hidden = 0;
+        $journalentry->deleted = 0;
+        $journalentry->keywords = '';
+        $journalentry->save();
+        // Create a new version record
         \App\Version::create([
-
+            'entry_id' => $journalentry->id,
+            'title' => request('title'),
+            'body' => ''
         ]);
-        return 0;
+        return ['message' => 'Entry created!'];;
 
     }
 
@@ -69,7 +83,6 @@ class JournalsController extends Controller
 
     public function fetchHiddenEntries(Request $request) {
         $journal_entries = auth()->user()->journals->find($request->journal_id)->journal_entries;
-        // return $journal_entries[0]->hidden;
         $all_hidden_entries = array();
         foreach($journal_entries as $journal_entry) {
             if($journal_entry->hidden == 1) {
@@ -84,8 +97,8 @@ class JournalsController extends Controller
 
     public function fetchDeletedEntries(Request $request) {
         $journal_entries = auth()->user()->journals->find($request->journal_id)->journal_entries;
-        // return $journal_entries[0]->hidden;
         $all_deleted_entries = array();
+        
         foreach($journal_entries as $journal_entry) {
             if($journal_entry->deleted == 1) {
                 foreach($journal_entry->latestVersions as $versions) {
@@ -123,38 +136,49 @@ class JournalsController extends Controller
         $versions = auth()->user()->journals->find($request->journal_id)->journal_entries->find($request->entry_id)->latestVersions;
         return $versions;
     }
-
+    
     public function fetchVersion(Request $request) {
         $version = auth()->user()->journals->find($request->journal_id)->journal_entries->find($request->entry_id)->latestVersions->find($request->id);
         return $version;
     }
-
     
-
-
-
+    
     public function index() {
         $user = auth()->user();
         $journals = $user->journals;
-
-
-        // $j = \App\Journal::first();
-        // $jes = $j->journal_entries; //list of journal entries
-        // $jeje = $jes->first(); //first journal entry
-        // $jev = $jeje->latestVersions->first(); //latest journal version
-        // $result = array();
-        // foreach($jes as $je) {
-        //     foreach($je->versions as $ver) {
-        //         array_push($result,$ver);
-        //     }
-        // }
-
-        // $journal_1 = \App\Journal::first();
-        // $journal_entries = $journal_1->journal_entries;
-        
-
-        // return view('journals', compact('journals','result','jev', 'journal_entries'));
         return view('journals', compact('journals'));
+    }
+    
+    
+    
+    public function searchAllEntries(Request $request) {
+        // $matchedTerm = Breed::where('text', 'LIKE', '%' . $term . '%')->get();
+
+        // $versions = auth()->user()->journals->find($request->journal_id)->journal_entries->find($request->entry_id)->latestVersions;
+        $all = array();
+        //  $query->where('category', 'LIKE', '%' . $category . '%');
+        $journals = auth()->user()->journals;
+        foreach($journals as $journal) {
+            foreach($journal->journal_entries as $entries) {
+                foreach($entries->latestVersions as $versions) {
+                    // array_push( $all,
+                    //     $versions->where('body', 'LIKE', '%' . $request->searchTerm . '%')
+                    //             ->where('title', 'LIKE', '%' . $request->searchTerm . '%')
+                    //             ->get()       
+                    // );
+                    array_push($all,
+                        $versions->where([
+                            'title' => 'LIKE', '%' . $request->searchTerm . '%',
+                        ])->get()
+                    );
+                    break;
+                }
+                break;
+            }
+            break;
+        }
+        // return response()->json($matchedTerm);
+        return $all;
     }
 }
 

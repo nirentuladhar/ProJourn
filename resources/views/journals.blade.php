@@ -13,45 +13,22 @@
         <div class="medium-3 large-2 cell">
             <div class="panel-left">
                 <div class="journals">
-                    <div class="journal-heading-container">
-                        <p class="journal-heading">
-                            JOURNALS
-                        </p>
-                        <a class="new-journal"> New Journal <i class="fa fa-plus-circle" style="padding-left: 4px" aria-hidden="true"></i></a>
-                    </div>
                     <journals></journals>
                 </div>
 
 
 
-                <a href="/logout"> Logout </a>
                 @if (Auth::check())
-                    <a class="logged-in-user">
-                        {{Auth::user()->firstname}} {{Auth::user()->lastname}}
-                    </a>
+                <div class="logged-in-user">
+                    <p><i class="fa fa-user" aria-hidden="true"></i> {{Auth::user()->firstname}} {{Auth::user()->lastname}}  </p>
+                    <a href="/logout" class="logout-button"> Logout <i class="fa fa-sign-out" aria-hidden="true"></i> </a>
+                </div>
                 @endif
             </div> 
         </div>
         <div class="medium-3 large-3 cell">
             <div class="panel-entries">
-                <form>
-                    <div style="padding-right:8px; padding-left: 8px;">
-                        <input type="text" class="search-box" placeholder="Search">
-                    </div>
-                    <fieldset class="small-12 columns"  style="display: none;">
-                        <input id="hidden" type="checkbox"><label for="hidden">Hidden</label>
-                        <input id="deleted" type="checkbox"><label for="deleted">Deleted</label>
-                    </fieldset>
-                    <div class="grid-x grid-margin-x"  style="display: none;">
-                        <div class="small-6 cell">
-                            <label for="date-from"> Date From </label><input id="date-from" type="date">
-                        </div>
-                        <div class="small-6 cell">
-                            <label for="date-upto"> Date Upto </label><input id="date-upto" type="date">
-                        </div>
-                    </div>
-                    <button class="button"  style="display: none;"> Search </button>
-                </form>
+            <search style="padding-left: 8px; padding-right: 8px"></search>
                 <hr>
             <journal-entries></journal-entries>
             <hidden-entries></hidden-entries>
@@ -59,9 +36,10 @@
             </div>
         </div>
         <div class="medium-6 large-6 cell">
-            <journal-entry></journal-entry>
-            <versions></versions>
-            
+        <div style="margin-left: 20px; max-width: 600px; display: flex; margin-left: auto; margin-right: auto; flex-wrap:wrap; overflow: scroll; height: 100vh;">
+            <journal-entry style="width: 100%"></journal-entry>
+            <versions style="width: 100%"></versions>
+        </div>
             {{--  <div class="panel-entry">
                 <h1 contenteditable="true">{{ $jev->title }}<br></h1>
                 <h6>{{ $jev->updated_at }}</h6>

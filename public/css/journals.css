@@ -14,6 +14,8 @@
     height: 30px;
     align-items: center;
     margin-bottom: 16px;
+    padding-right: 8px;
+    padding-left: 16px;
 }
 
 .journal-heading {
@@ -26,19 +28,33 @@
 
 .journals {
     width: 100%;
-    padding-right: 8px;
-    padding-left: 16px;
 }
 
+.journals ul li {
+    margin: 0;
+}
 
 .journals ul a {
     display: flex;
     align-items: center;
+    padding-right: 8px;
+    padding-left: 16px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.journals ul a.active {
+    background: #333;
 }
 
 .new-journal {
     font-size: 0.8rem;
     color: rgba(255,255,255,0.7);
+}
+
+.new-journal.entry {
+    color: rgba(0,0,0,0.5);
+    margin-left: 8px;
 }
 
 .new-journal:hover {
@@ -86,6 +102,31 @@
     color: #ff671f;
 }
 
+.journal-entry-tabs {
+    margin-left: 8px;
+    margin-bottom: 8px;
+}
+
+.journal-entry-tabs a {
+    font-size: 0.9rem;
+    color: #333;
+    font-weight: bold;
+    padding: 4px 12px;
+}
+
+.journal-entry-tabs a:hover {
+    text-decoration: underline;
+}
+
+.journal-entry-tabs a.active {
+    background: #CCC;
+    border-radius: 4px;
+}
+
+
+.hide-add-button {
+    display: none;
+}
 
 .logged-in-user {
     color: white;
@@ -96,10 +137,26 @@
     margin-top: auto;
 }
 
-.logged-in-user:hover {
-    background: #444;
-    color: white;
+.logged-in-user p {
+    margin-bottom: 0;
 }
+
+.logout-button {
+    color: #AAA;
+    text-decoration: underline;
+}
+.logout-button:hover {
+    color: #ff671f;
+}
+
+.journal-entry-date {
+    font-size: 0.8rem;
+    font-style: italic;
+    color: #777;
+    margin:0;
+    margin-bottom: 16px;
+}
+
 
 .panel-entries {
     background: #EEE;
@@ -126,6 +183,11 @@
 
 .panel-entries .search-box::placeholder {
     color: #555;
+}
+
+.add-new-journal-container{
+    padding-right: 8px;
+    padding-left: 16px;
 }
 
 .add-new-journal-textbox {

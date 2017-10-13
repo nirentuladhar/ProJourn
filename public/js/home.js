@@ -42,26 +42,29 @@ $journals = Vue.component('journals', {
         this.fetchJournals();
     },
     methods: {
+        // get all journals associated with logged in user
         fetchJournals: function () {
             axios.get('api/journals')
                 .then(response => this.journals = response.data);
         },
+        // Hides or unhides 'Add new journal' button
         toggle: function () {
             this.hideAddButton = !this.hideAddButton
         },
+        // Creates a new journal with the name entered by user
         createJournal: function() {
             axios.post('api/newJournal', { name: this.name })
                 .then(response => console.log(response))
                 .catch(function (error) { console.log('JOURNAL -> ' + error.message) });
             this.fetchJournals();
         },
+
         onClickJournal: function(id) {
-            activeJournal = id;
             this.activeId = id;
             this.journals.isActive = !this.journals.isActive;
+            activeJournal = id;
             Event.$emit('journalClick', id);
             Event.$emit('entriesIsActive');
-
         }
     }
 })
@@ -101,15 +104,17 @@ Vue.component('journal-entries', {
             journalEntries: {
                 title: ''
             },
-            activeJournal:'',
-            active: false,
-            activeTab: '',
-            showAllTabs: false,
-            hideAddButton: true
+            activeJournal:'', // Stores which journal is active
+            active: false, // Stores whether the entries tab is active or not
+            hideAddButton: true, // Add new Journal Entry Button
+            // Tabs = Entries, Deleted, Hidden on top of journal entry list
+            activeTab: '', // Stores which tab is active: Entries, Deleted or Hidden
+            showAllTabs: false, // Only shows all tabs after a journal is active/clicked
         }
     },
     created: function () {
         var that = this;
+        // Loads all the journal entries that aren't hidden or deleted upon clicking a journal 
         Event.$on('journalClick', function (id) {
             Event.$emit('entriesIsActive');
             axios.post('api/journalEntries', { journal_id: id })
@@ -127,9 +132,7 @@ Vue.component('journal-entries', {
         })
         Event.$on('hiddenIsActive', function () {
             that.active = false;
-        })
-
-        
+        }) 
     },
     methods: {
         createJournalEntry: function () {
@@ -180,8 +183,8 @@ Vue.component('hidden-entries', {
             journalEntries: {
                 title: ''
             },
-            activeJournal: '',
-            active: false
+            activeJournal: '', // Stores which journal is active
+            active: false // Stores whether the hidden tab is active or not
         }
     },
     created: function () {
@@ -204,11 +207,11 @@ Vue.component('hidden-entries', {
         
     },
     methods: {
-        createJournalEntry: function () {
-            axios.post('api/newJournalEntry', { name: this.name })
-                .then(response => console.log(response))
-                .catch(function (error) { console.log('JOURNAL -> ' + error.message) });
-        },
+        // createJournalEntry: function () {
+        //     axios.post('api/newJournalEntry', { name: this.name })
+        //         .then(response => console.log(response))
+        //         .catch(function (error) { console.log('JOURNAL -> ' + error.message) });
+        // },
         onClickEntry(id) {
             Event.$emit('journalEntryClick', this.activeJournal, id);
         }
@@ -234,8 +237,8 @@ Vue.component('deleted-entries', {
             journalEntries: {
                 title: ''
             },
-            activeJournal: '',
-            active: false
+            activeJournal: '', // Stores which journal is active
+            active: false // Stores whether the deleted tab is active or not
         }
     },
     created: function () {
@@ -258,11 +261,11 @@ Vue.component('deleted-entries', {
 
     },
     methods: {
-        createJournalEntry: function () {
-            axios.post('api/newJournalEntry', { name: this.name })
-                .then(response => console.log(response))
-                .catch(function (error) { console.log('JOURNAL -> ' + error.message) });
-        },
+        // createJournalEntry: function () {
+        //     axios.post('api/newJournalEntry', { name: this.name })
+        //         .then(response => console.log(response))
+        //         .catch(function (error) { console.log('JOURNAL -> ' + error.message) });
+        // },
         onClickEntry(id) {
             Event.$emit('journalEntryClick', this.activeJournal, id);
         }
@@ -292,9 +295,9 @@ Vue.component('journal-entry', {
                 title:'',
                 body:''
             },
-            hiddenFlag: false,
-            showJournalEntry: false,
-            deleteFlag: false,
+            hiddenFlag: false, // Whether the entry is hidden or not, shows 'Hide' button if false
+            showJournalEntry: false, // Shows entry on journal entry click
+            deleteFlag: false, // Whether the entry is delete or not, shows 'Delete' button if false
             activeJournal: '',
         }
     },
@@ -346,16 +349,14 @@ Vue.component('journal-entry', {
             axios.post('api/deleteJournalEntry', { id: journalEntryId, journal_id: activeJournal })
                 .then(response => { })
                 .catch(function (error) { console.log('fetch me -> ' + error.message) });
-                Event.$emit('journalClick', activeJournal);
+            Event.$emit('journalClick', activeJournal);
             },
         entryHideButtonClick(journalEntryId) {
             this.hiddenFlag = !this.hiddenFlag;
             axios.post('api/toggleHideJournalEntry', {id: journalEntryId, journal_id: activeJournal})
                 .then(response => {})
                 .catch(function (error) { console.log('fetch me -> ' + error.message) });
-            
-            Event.$emit('journalClick', activeJournal);
-            
+            Event.$emit('journalClick', activeJournal);      
         }
     }
 })

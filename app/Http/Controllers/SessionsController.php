@@ -11,11 +11,13 @@ class SessionsController extends Controller
         $this->middleware('guest', ['except' => 'destroy']);
     }
 
+    // Returns login page
     public function create() {
         return view('sessions.create');
     }
 
     public function destroy() {
+        // Log out auth, redirect home after successful log out
         auth()->logout();
         return redirect()->home();
     }
@@ -30,7 +32,7 @@ class SessionsController extends Controller
                 'message' => 'Please check your credentials and try again.'
             ]);
         }
-        // After login, Redirect to the home page
+        // If successful login, redirect to the home page
         return redirect()->home();
     }
 }

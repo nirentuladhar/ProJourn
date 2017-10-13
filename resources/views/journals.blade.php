@@ -40,11 +40,6 @@
             <journal-entry style="width: 100%"></journal-entry>
             <versions style="width: 100%"></versions>
         </div>
-            {{--  <div class="panel-entry">
-                <h1 contenteditable="true">{{ $jev->title }}<br></h1>
-                <h6>{{ $jev->updated_at }}</h6>
-                <p contenteditable="true">{{ $jev->body }}<br></p>
-            </div>  --}}
         </div>
     </div>
 </div>

@@ -18,8 +18,4 @@ class Journal extends Model
     public function journal_entries() {
         return $this->hasMany("App\JournalEntry")->orderBy('updated_at','DESC');
     }
-
-    // public function scopeDateDescending($query) {
-    //     return $query->orderBy('created_at','DESC');
-    // }
 }

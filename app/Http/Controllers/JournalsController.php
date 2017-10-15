@@ -170,10 +170,9 @@ class JournalsController extends Controller
             return $this->searchRegularEntries($request);
         } else {
             if ($request->date_from != "") { 
-                return $this->searchIncludesHiddenDeletedEntries($request);
+                return $this->searchIncludesHiddenDeletedEntriesWithDate($request);
             }
             return $this->searchIncludesHiddenDeletedEntries($request);
-            // return $this->searchIncludesHiddenDeletedEntriesWithDate($request);
         }   
     }
 
@@ -191,7 +190,6 @@ class JournalsController extends Controller
 
     public function searchRegularEntries($request) {
         $user_id = auth()->user()->id;
-        dd($request->date_from);
         $all = auth()->user()
             ->join('journals', $user_id, '=', 'journals.user_id')
             ->join('journal_entries','journals.id', '=', 'journal_entries.journal_id')
@@ -294,11 +292,45 @@ class JournalsController extends Controller
                 ->where('journal_entries.deleted', '=', $request->deletedFlag)
                 ->where('journal_entries.hidden', '=', $request->hiddenFlag);
             })
-            ->whereDate('versions.updated_at', '>=', $request->date_from)
-            ->whereDate('versions.updated_at', '<=', $request->date_upto)
             ->get();
 
         return $all;
+    }
+
+    public function searchIncludesHiddenDeletedEntriesWithDate($request) {
+        $user_id = auth()->user()->id;  
+        $variable = !$this->checkValidDate($request->date_upto); 
+        $all = auth()->user()
+            ->join('journals', $user_id, '=', 'journals.user_id')
+            ->join('journal_entries','journals.id', '=', 'journal_entries.journal_id')
+            ->join('versions', 'journal_entries.id', '=', 'versions.entry_id')
+            ->select(
+                DB::raw('journals.id AS journal_id'),
+                DB::raw('journals.name AS journal_name'),
+                'versions.id',
+                'versions.entry_id',
+                'versions.title',
+                'versions.body',
+                'versions.created_at',
+                'versions.updated_at',
+                'journal_entries.deleted'
+                )
+            ->where('users.id', '=', $user_id)
+            ->where(function($query) use ($request){
+                $query
+                ->where('versions.title', 'LIKE', "%$request->searchTerm%")
+                ->orWhere('versions.body', 'LIKE', "%$request->searchTerm%")
+                ->where('journal_entries.deleted', '=', $request->deletedFlag)
+                ->where('journal_entries.hidden', '=', $request->hiddenFlag);
+            })
+            ->when($variable, function($query) use ($request) {
+                return $query->whereDate('versions.updated_at', '=', $request->date_from);
+            }, function ($query) use ($request) {
+                return $query->whereDate('versions.updated_at', '>=', $request->date_from)
+                             ->whereDate('versions.updated_at', '<=', $request->date_upto);
+            });
+
+        return $all->get();
     }
 
     

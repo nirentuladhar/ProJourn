@@ -133,6 +133,10 @@ Vue.component('journal-entries', {
         Event.$on('hiddenIsActive', function () {
             that.active = false;
         }) 
+        Event.$on('searchActive', function() {
+            that.active =false;
+            that.showAllTabs = false;
+        })
     },
     methods: {
         createJournalEntry: function () {
@@ -476,7 +480,13 @@ Vue.component('search', {
             axios.post('api/versions', { journal_id: journalId, entry_id: id })
                 .then(response => { that.versions = response.data; that.showVersions = true })
                 .catch(function (error) { console.log('fetch me -> ' + error.message) });
+        }),
+        Event.$on('journalClick', function() {
+            that.active = false;
+            that.searchTerm = '';
+            that.filtersActive = false;
         })
+
     },
     methods: {
         toggleFiltersActive: function () {

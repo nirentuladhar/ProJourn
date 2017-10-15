@@ -39,7 +39,7 @@ class JournalsController extends Controller
 
     // Gets values from the user through a request 
     // Creates a new journal entry
-    public function storeEntries() {
+    public function storeEntries(Request $request) {
         $this->validate(request(), [
             'journal_id' => 'required',
             'title' => 'required'
@@ -57,7 +57,8 @@ class JournalsController extends Controller
             'title' => request('title'),
             'body' => ''
         ]);
-        return ['message' => 'Entry created!'];;
+
+        return ['message' => "($request->title) Entry created!"];;
 
     }
 

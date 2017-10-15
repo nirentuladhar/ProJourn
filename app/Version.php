@@ -12,8 +12,7 @@ class Version extends Model
     ];
 
     public function journalentry() {
-        return $this->belongsTo("App\JournalEntry", "entry_id");
+        return $this->belongsTo("App\JournalEntry", "entry_id")->orderBy('updated_at','DESC');
     }
-
 
 }

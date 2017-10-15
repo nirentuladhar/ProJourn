@@ -36,4 +36,6 @@ Route::post('api/deleteJournalEntry', 'JournalsController@deleteJournalEntry');
 
 // API -> search for records
 Route::post('api/searchAllEntries', 'JournalsController@searchAllEntries');
+Route::get('api/searchAllEntries', 'JournalsController@searchAllEntries');
+
 

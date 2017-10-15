@@ -320,6 +320,16 @@ Vue.component('journal-entry', {
                 })
                 .catch(function (error) { console.log('fetch me -> ' + error.message) });
         })
+        Event.$on('searchEntryClick', function (journalId, entryId, id) {      
+                axios.post('api/version', { journal_id: journalId, entry_id: entryId, id: id })
+                .then(response => {
+                    that.journalEntry = response.data;
+                    that.showJournalEntry = true;
+                })
+                .catch(function (error) { console.log('fetch me -> ' + error.message) });
+                that.hiddenFlag = true;
+                that.deleteFlag = true;
+        })
         Event.$on('journalClick', function () {
             that.deleteFlag = false;
             that.hiddenFlag = false;
@@ -392,6 +402,7 @@ Vue.component('versions', {
         Event.$on('journalClick', function () { that.showVersions = false })
         Event.$on('hiddenIsActive', function () { that.showVersions = false })
         Event.$on('deletedIsActive', function () { that.showVersions = false })
+        Event.$on('searchActive', function () { that.showVersions = false })
     },
     methods: {
         onEntryVersionClick(entry_id, id) {
@@ -402,44 +413,99 @@ Vue.component('versions', {
 
 Vue.component('search', {
     template: `
-        <form>
+    <div>
+        <form @submit.prevent=""  style="padding-left: 8px; padding-right: 8px">
             <div style="padding-right:8px;">
                 <input type="text" class="search-box" placeholder="Search" v-model="searchTerm">
             </div>
-            <fieldset class="small-12 columns" style="display: none;">
-                <input id="hidden" type="checkbox" v-model="hiddenFlag"><label for="hidden">Hidden</label>
-                <input id="deleted" type="checkbox" v-model="deletedFlag"><label for="deleted">Deleted</label>
-            </fieldset>
-            <div class="grid-x grid-margin-x" style="display: none;">
-                <div class="small-6 cell">
-                    <label for="date-from"> Date From </label><input id="date-from" type="date">
-                </div>
-                <div class="small-6 cell">
-                    <label for="date-upto"> Date Upto </label><input id="date-upto" type="date">
+            <a class="search-filter-button" @click="toggleFiltersActive()"> Filters <i class="fa fa-caret-down" aria-hidden="true"></i> </a>
+            <div v-if="filtersActive">
+                <fieldset class="small-12 columns search-checkboxes" >
+                    <input id="hidden" type="checkbox" v-model="hiddenFlag"><label class="search-labels" for="hidden">Hidden</label>
+                    <input id="deleted" type="checkbox" v-model="deletedFlag"><label class="search-labels" for="deleted">Deleted</label>
+                </fieldset>
+                <div class="grid-x grid-margin-x">
+                    <div class="small-6 cell">
+                        <label class="search-labels" for="date-from"> Date From </label><input class="search-date-picker" v-model="date_from"  id="date-from" type="date">
+                    </div>
+                    <div class="small-6 cell" v-if="date_from != ''">
+                        <label class="search-labels" for="date-upto"> Date Upto </label><input  class="search-date-picker" v-model="date_upto" id="date-upto" type="date">
+                    </div>
+                    <p style="font-size: 0.8rem; color: #777; padding-left: 16px; padding-right: 16px;"> Enter only 'date from' if you would like to search from a specific date </p>
                 </div>
             </div>
             <button class="button" @click="searchButtonClick()"> Search </button>
         </form>
+        <div v-if="active">
+            <hr style="margin: 0;">
+            <p class="search-close-button" @click="onCloseClick()">
+                Close <i class="fa fa-times" aria-hidden="true"></i>
+            </p>
+            <p class="search-result-text" @click="active=false"> Search Results </p>
+            <ul class="journal-entries-title">
+                <li v-for="(journalEntry, index) in journalEntries">
+                    <a href="#" @click="onClickEntry(journalEntry.journal_id, journalEntry.entry_id, journalEntry.id)">
+                        <p class="search-journal-entry-name">{{ journalEntry.title }}</p>
+                        <span class="search-journal-name"><i aria-hidden="true" class="fa fa-file"></i> <i class="fa fa-caret-right" aria-hidden="true" style="padding-left: 4px; padding-right: 4px"></i> {{ journalEntry.journal_name }} </span> 
+                            <p class="search-updated-at">Last updated at {{journalEntry.updated_at}}</p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
     `,
     data: function() {
         return {
             searchTerm:'',
             hiddenFlag: false,
-            deletedFlag: false
+            deletedFlag: false,
+            date_from: '',
+            date_upto: '',
+            name: '',
+            journalEntries: {
+                title: '',
+            },
+            active: false,
+            filtersActive: false,
+            activeJournal: ''
         }
     },
     created: function() {
-
+        var that = this;
+        Event.$on('journalEntryClick', function (journalId, id) {
+            axios.post('api/versions', { journal_id: journalId, entry_id: id })
+                .then(response => { that.versions = response.data; that.showVersions = true })
+                .catch(function (error) { console.log('fetch me -> ' + error.message) });
+        })
     },
     methods: {
+        toggleFiltersActive: function () {
+            this.filtersActive = !this.filtersActive
+        },
+        onCloseClick() {
+            this.active = false;
+            this.searchTerm = '';
+            this.filtersActive = false;
+            Event.$emit('journalClick');
+        }, 
         searchButtonClick() {
-            // alert(this.searchTerm);
-            // alert(this.hiddenFlag);
-            // alert(this.deletedFlag);
-            axios.post('api/searchAllEntries', { searchTerm: this.searchTerm, hiddenFlag: this.hiddenFlag })
-                .then(response => { console.log(response.data)})
-                .catch(function (error) { console.log('fetch me -> ' + error.message) });
-
+            this.active= true;
+            Event.$emit('searchActive');
+            axios.post('api/searchAllEntries', {
+                searchTerm: this.searchTerm,
+                hiddenFlag: this.hiddenFlag,
+                deletedFlag: this.deletedFlag,
+                date_from: this.date_from,
+                date_upto: this.date_upto,
+            })
+            .then(response => {
+                this.journalEntries = response.data
+            })
+            .catch(function (error) { console.log('fetch me -> ' + error.message) });
+        },
+        onClickEntry(journal_id, entry_id, id) {
+            Event.$emit('searchActive');
+            Event.$emit('searchEntryClick', journal_id, entry_id, id);
         }
     }
 })

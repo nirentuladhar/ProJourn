@@ -28,7 +28,7 @@
         </div>
         <div class="medium-3 large-3 cell">
             <div class="panel-entries">
-            <search style="padding-left: 8px; padding-right: 8px"></search>
+            <search></search>
                 <hr>
             <journal-entries></journal-entries>
             <hidden-entries></hidden-entries>

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-
+use DB;
 use Illuminate\Http\Request;
 class JournalsController extends Controller
 {
@@ -155,41 +155,151 @@ class JournalsController extends Controller
         $journals = $user->journals;
         return view('journals', compact('journals'));
     }
-    
-    
+
     
     public function searchAllEntries(Request $request) {
-        // $matchedTerm = Breed::where('text', 'LIKE', '%' . $term . '%')->get();
+        $request->deletedFlag = $this->convertToBinary($request->deletedFlag);
+        $request->hiddenFlag = $this->convertToBinary($request->hiddenFlag);
 
-        // $versions = auth()->user()->journals->find($request->journal_id)->journal_entries->find($request->entry_id)->latestVersions;
-        $all = array();
-        //  $query->where('category', 'LIKE', '%' . $category . '%');
-        $journals = auth()->user()->journals;
-        foreach($journals as $journal) {
-            foreach($journal->journal_entries as $entries) {
-                foreach($entries->latestVersions as $versions) {
-                    // array_push( $all,
-                    //     $versions->where('body', 'LIKE', '%' . $request->searchTerm . '%')
-                    //             ->orWhere('title', 'LIKE', '%' . $request->searchTerm . '%')
-                    //             ->get()       
-                    // );
-                    array_push($all,
-                        $versions->where(
-                            'title', 'LIKE', "%$request->searchTerm%"
-                        )->orWhere(
-                            'body','LIKE',"%$request->searchTerm%"
-                        )->orWhere(
-                            ''
-                        )->get()
-                    );
-                    break;
-                }
-                break;
+        
+
+        if ($request->hiddenFlag == '0' && $request->deletedFlag == '0') {
+            if ($request->date_from != "") {
+                return $this->searchRegularEntriesWithDate($request);
             }
-            break;
-        }
-        // return response()->json($matchedTerm);
+            return $this->searchRegularEntries($request);
+        } else {
+            if ($request->date_from != "") {
+                return $this->searchIncludesHiddenDeletedEntries($request);
+            }
+            return $this->searchIncludesHiddenDeletedEntries($request);
+            // return $this->searchIncludesHiddenDeletedEntriesWithDate($request);
+        }   
+    }
+
+
+
+
+    public function convertToBinary($request) {
+        if ($request == 'true') {
+            return '1';
+        } else {
+            return '0';
+        }; 
+    }
+
+
+    public function searchRegularEntries($request) {
+        $user_id = auth()->user()->id;
+        dd($request->date_from);
+        $all = auth()->user()
+            ->join('journals', $user_id, '=', 'journals.user_id')
+            ->join('journal_entries','journals.id', '=', 'journal_entries.journal_id')
+            ->join('versions', 'journal_entries.id', '=', 'versions.entry_id')
+            ->select(
+                DB::raw('journals.id AS journal_id'),
+                DB::raw('journals.name AS journal_name'),
+                'versions.id',
+                'versions.entry_id',
+                'versions.title',
+                'versions.body',
+                'versions.created_at',
+                'versions.updated_at'
+                )
+            ->where('users.id', '=', $user_id)
+            ->where(function($query) use ($request){
+                $query
+                ->where('versions.title', 'LIKE', "%$request->searchTerm%")
+                ->orWhere('versions.body', 'LIKE', "%$request->searchTerm%");
+            })
+            ->where(function($query) use ($request){
+                $query->where('journal_entries.deleted', '=', $request->deletedFlag);
+            })
+            ->where(function($query) use ($request){
+                $query->where('journal_entries.hidden', '=', $request->hiddenFlag);
+            })
+            ->get();
+
         return $all;
     }
-}
 
+    
+    public function searchRegularEntriesWithDate($request) {
+        $user_id = auth()->user()->id;
+        $variable = !$this->checkValidDate($request->date_upto);
+        $all = auth()->user()
+            ->join('journals', $user_id, '=', 'journals.user_id')
+            ->join('journal_entries','journals.id', '=', 'journal_entries.journal_id')
+            ->join('versions', 'journal_entries.id', '=', 'versions.entry_id')
+            ->select(
+                DB::raw('journals.id AS journal_id'),
+                DB::raw('journals.name AS journal_name'),
+                'versions.id',
+                'versions.entry_id',
+                'versions.title',
+                'versions.body',
+                'versions.created_at',
+                'versions.updated_at',
+                'journal_entries.deleted'
+                )
+            ->where('users.id', '=', $user_id)
+            ->where(function($query) use ($request){
+                $query
+                ->where('versions.title', 'LIKE', "%$request->searchTerm%")
+                ->orWhere('versions.body', 'LIKE', "%$request->searchTerm%");
+            })
+            ->where(function($query) use ($request){
+                $query->where('journal_entries.deleted', '=', $request->deletedFlag);
+            })
+            ->where(function($query) use ($request){
+                $query->where('journal_entries.hidden', '=', $request->hiddenFlag);
+            })
+            ->when($variable, function($query) use ($request) {
+                return $query->whereDate('versions.updated_at', '=', $request->date_from);
+            }, function ($query) use ($request) {
+                return $query->whereDate('versions.updated_at', '>=', $request->date_from)
+                             ->whereDate('versions.updated_at', '<=', $request->date_upto);
+            });
+        return $all->get();
+    }
+
+    public function checkValidDate($request) {
+        return $request != "";
+
+    }
+
+
+    public function searchIncludesHiddenDeletedEntries($request) {
+        $user_id = auth()->user()->id;   
+        $all = auth()->user()
+            ->join('journals', $user_id, '=', 'journals.user_id')
+            ->join('journal_entries','journals.id', '=', 'journal_entries.journal_id')
+            ->join('versions', 'journal_entries.id', '=', 'versions.entry_id')
+            ->select(
+                DB::raw('journals.id AS journal_id'),
+                DB::raw('journals.name AS journal_name'),
+                'versions.id',
+                'versions.entry_id',
+                'versions.title',
+                'versions.body',
+                'versions.created_at',
+                'versions.updated_at',
+                'journal_entries.deleted'
+                )
+            ->where('users.id', '=', $user_id)
+            ->where(function($query) use ($request){
+                $query
+                ->where('versions.title', 'LIKE', "%$request->searchTerm%")
+                ->orWhere('versions.body', 'LIKE', "%$request->searchTerm%")
+                ->where('journal_entries.deleted', '=', $request->deletedFlag)
+                ->where('journal_entries.hidden', '=', $request->hiddenFlag);
+            })
+            ->whereDate('versions.updated_at', '>=', $request->date_from)
+            ->whereDate('versions.updated_at', '<=', $request->date_upto)
+            ->get();
+
+        return $all;
+    }
+
+    
+}

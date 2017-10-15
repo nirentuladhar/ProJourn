@@ -145,6 +145,7 @@ Vue.component('journal-entries', {
             .catch(function (error) { console.log('JOURNAL ENTRY -> ' + error.message) });
             this.hideAddButton = true;
             Event.$emit('journalClick', this.activeJournal);
+            Event.$emit('journalClick', this.activeJournal);
         },
         toggle: function () {
             this.hideAddButton = !this.hideAddButton

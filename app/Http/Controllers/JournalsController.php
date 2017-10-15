@@ -169,7 +169,7 @@ class JournalsController extends Controller
             }
             return $this->searchRegularEntries($request);
         } else {
-            if ($request->date_from != "") {
+            if ($request->date_from != "") { 
                 return $this->searchIncludesHiddenDeletedEntries($request);
             }
             return $this->searchIncludesHiddenDeletedEntries($request);

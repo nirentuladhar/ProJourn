@@ -35,4 +35,10 @@ class SessionsController extends Controller
         // If successful login, redirect to the home page
         return redirect()->home();
     }
+
+
+    public function faqs()
+    {
+        return view('sessions.create');
+    }
 }

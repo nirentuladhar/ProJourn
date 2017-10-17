@@ -23,6 +23,13 @@ class JournalsController extends Controller
         return ['message' => 'Journal created!'];
     }
 
+    // Returns the journal page
+    public function index() {
+        $user = auth()->user();
+        $journals = $user->journals;
+        return view('journals', compact('journals'));
+    }
+
     // Gets values from the user through a request 
     // Creates a new version for a journal entry
     public function storeJournalEntryVersion() {
@@ -150,29 +157,28 @@ class JournalsController extends Controller
         return 'deleted';
     }
 
-
-    public function index() {
-        $user = auth()->user();
-        $journals = $user->journals;
-        return view('journals', compact('journals'));
-    }
-
-    
+    // Search through the journal list
     public function searchAllEntries(Request $request) {
+        // Converts true and false values to binary
+        // Because the values are stored as 1 or 0 in the database
         $request->deletedFlag = $this->convertToBinary($request->deletedFlag);
         $request->hiddenFlag = $this->convertToBinary($request->hiddenFlag);
 
-        
-
+        // If it is a regular entry that is not hidden or deleted
         if ($request->hiddenFlag == '0' && $request->deletedFlag == '0') {
+            // Has a date associated with the search
             if ($request->date_from != "") {
                 return $this->searchRegularEntriesWithDate($request);
             }
+            // Does not have a date
             return $this->searchRegularEntries($request);
+        // If it is an entry that is either hidden or deleted
         } else {
+            // Has a date associated with the search
             if ($request->date_from != "") { 
                 return $this->searchIncludesHiddenDeletedEntriesWithDate($request);
             }
+            // Does not have a date            
             return $this->searchIncludesHiddenDeletedEntries($request);
         }   
     }
@@ -205,6 +211,7 @@ class JournalsController extends Controller
                 'versions.created_at',
                 'versions.updated_at'
                 )
+            //returns records for only logged in user            
             ->where('users.id', '=', $user_id)
             ->where(function($query) use ($request){
                 $query
@@ -225,7 +232,9 @@ class JournalsController extends Controller
     
     public function searchRegularEntriesWithDate($request) {
         $user_id = auth()->user()->id;
-        $variable = !$this->checkValidDate($request->date_upto);
+        // checks whether the request has a date upto or not
+        // if it doesn't it only queries with date from
+        $dateFlag = !$this->checkValidDate($request->date_upto);
         $all = auth()->user()
             ->join('journals', $user_id, '=', 'journals.user_id')
             ->join('journal_entries','journals.id', '=', 'journal_entries.journal_id')
@@ -241,6 +250,7 @@ class JournalsController extends Controller
                 'versions.updated_at',
                 'journal_entries.deleted'
                 )
+            //returns records for only logged in user            
             ->where('users.id', '=', $user_id)
             ->where(function($query) use ($request){
                 $query
@@ -253,7 +263,9 @@ class JournalsController extends Controller
             ->where(function($query) use ($request){
                 $query->where('journal_entries.hidden', '=', $request->hiddenFlag);
             })
-            ->when($variable, function($query) use ($request) {
+            // checks whether the request has a date upto or not
+            // returns the correct query based on the flag
+            ->when($dateFlag, function($query) use ($request) {
                 return $query->whereDate('versions.updated_at', '=', $request->date_from);
             }, function ($query) use ($request) {
                 return $query->whereDate('versions.updated_at', '>=', $request->date_from)
@@ -285,6 +297,7 @@ class JournalsController extends Controller
                 'versions.updated_at',
                 'journal_entries.deleted'
                 )
+            //returns records for only logged in user
             ->where('users.id', '=', $user_id)
             ->where(function($query) use ($request){
                 $query
@@ -300,7 +313,9 @@ class JournalsController extends Controller
 
     public function searchIncludesHiddenDeletedEntriesWithDate($request) {
         $user_id = auth()->user()->id;  
-        $variable = !$this->checkValidDate($request->date_upto); 
+        // checks whether the request has a date upto or not
+        // if it doesn't it only queries with date from
+        $dateFlag = !$this->checkValidDate($request->date_upto); 
         $all = auth()->user()
             ->join('journals', $user_id, '=', 'journals.user_id')
             ->join('journal_entries','journals.id', '=', 'journal_entries.journal_id')
@@ -316,6 +331,7 @@ class JournalsController extends Controller
                 'versions.updated_at',
                 'journal_entries.deleted'
                 )
+            //returns records for only logged in user
             ->where('users.id', '=', $user_id)
             ->where(function($query) use ($request){
                 $query
@@ -324,7 +340,9 @@ class JournalsController extends Controller
                 ->where('journal_entries.deleted', '=', $request->deletedFlag)
                 ->where('journal_entries.hidden', '=', $request->hiddenFlag);
             })
-            ->when($variable, function($query) use ($request) {
+            // checks whether the request has a date upto or not
+            // returns the correct query based on the flag
+            ->when($dateFlag, function($query) use ($request) {
                 return $query->whereDate('versions.updated_at', '=', $request->date_from);
             }, function ($query) use ($request) {
                 return $query->whereDate('versions.updated_at', '>=', $request->date_from)

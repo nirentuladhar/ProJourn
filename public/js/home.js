@@ -87,7 +87,7 @@ Vue.component('journal-entries', {
             </form>
         </div>
 
-        <p v-if="showAllTabs === false" style="padding-left: 8px;"> No journal selected </p>
+        <p v-if="showAllTabs === false" style="padding-left: 8px;"> Journal not selected </p>
         <ul class="journal-entries-title" v-if="active">
             <li v-for="(journalEntry, index) in journalEntries">
                 <a href="#" @click="onClickEntry(journalEntry.entry_id)">
@@ -127,12 +127,15 @@ Vue.component('journal-entries', {
                 })
                 .catch(function (error) { console.log('fetch me -> ' + error.message) });
         })
+        // If deleted is active, regular entries should not be visible
         Event.$on('deletedIsActive', function () {
             that.active = false;
         })
+        // If hidden is active, regular entries should not be visible
         Event.$on('hiddenIsActive', function () {
             that.active = false;
         }) 
+        // If search is active, regular entries should not be visible
         Event.$on('searchActive', function() {
             that.active =false;
             that.showAllTabs = false;
@@ -153,14 +156,17 @@ Vue.component('journal-entries', {
         onClickEntry(id) {
             Event.$emit('journalEntryClick', this.activeJournal, id );
         },
+        // Broadcasts that hidden tab is active when 'Hidden' tab is click
         showHiddenEntries(name) {
             this.activeTab = name;
             Event.$emit('hiddenIsActive', this.activeJournal);
         },
+        // Broadcasts that deleted tab is active when 'Deleted' tab is click
         showDeletedEntries(name) {
             this.activeTab = name;
             Event.$emit('deletedIsActive', this.activeJournal);
         },
+        // Loads all the regular entries
         showEntries(name) {
             this.activeTab = name;
             Event.$emit('journalClick', this.activeJournal);
@@ -194,6 +200,7 @@ Vue.component('hidden-entries', {
     },
     created: function () {
         var that = this;
+        // Loads all the hidden entries if hidden tab is clicked
         Event.$on('hiddenIsActive', function (id) {
             axios.post('api/hiddenEntries', { journal_id: id })
             .then(response => {
@@ -203,20 +210,17 @@ Vue.component('hidden-entries', {
             })
             .catch(function (error) { console.log('fetch me -> ' + error.message) });
         })
+        // If regular entries is active, hidden entries should not be visible
         Event.$on('entriesIsActive', function () {
             that.active = false;
         })
+        // If deleted entries is active, hidden entries should not be visible
         Event.$on('deletedIsActive', function () {
             that.active = false;
         })
         
     },
     methods: {
-        // createJournalEntry: function () {
-        //     axios.post('api/newJournalEntry', { name: this.name })
-        //         .then(response => console.log(response))
-        //         .catch(function (error) { console.log('JOURNAL -> ' + error.message) });
-        // },
         onClickEntry(id) {
             Event.$emit('journalEntryClick', this.activeJournal, id);
         }
@@ -248,6 +252,7 @@ Vue.component('deleted-entries', {
     },
     created: function () {
         var that = this;
+        // Loads all the deleted entries if deleted tab is clicked
         Event.$on('deletedIsActive', function (id) {
             axios.post('api/deletedEntries', { journal_id: id })
                 .then(response => {
@@ -257,20 +262,18 @@ Vue.component('deleted-entries', {
                 })
                 .catch(function (error) { console.log('fetch me -> ' + error.message) });
         })
+        
+        // If regular entries is active, deleted entries should not be visible
         Event.$on('entriesIsActive', function () {
             that.active = false;
         })
+        // If hidden entries is active, deleted entries should not be visible
         Event.$on('hiddenIsActive', function () {
             that.active = false;
         })
 
     },
     methods: {
-        // createJournalEntry: function () {
-        //     axios.post('api/newJournalEntry', { name: this.name })
-        //         .then(response => console.log(response))
-        //         .catch(function (error) { console.log('JOURNAL -> ' + error.message) });
-        // },
         onClickEntry(id) {
             Event.$emit('journalEntryClick', this.activeJournal, id);
         }
@@ -280,7 +283,7 @@ Vue.component('deleted-entries', {
 Vue.component('journal-entry', {
     template: `
         <div style="margin-top: 64px;">
-            <p v-if="showJournalEntry === false"> No journal entry selected </p>
+            <p v-if="showJournalEntry === false"> Journal entry not selected </p>
             <div class="panel-entry" v-if="showJournalEntry">
             <input type="text" v-model="journalEntry.title" style="border:none; font-size: 20px" id="title" name="title" placeholder="Write your heading here...">
             <p class="journal-entry-date">Created at: {{ journalEntry.created_at }} | Last updated: {{ journalEntry.updated_at }}</p>
@@ -289,7 +292,7 @@ Vue.component('journal-entry', {
                     <button type="Submit" class="button" @click="entrySaveButtonClick(journalEntry.entry_id, journalEntry.id)">Save</button>
                     <button type="Submit" class="button" @click="entryHideButtonClick(journalEntry.entry_id)" v-if="!hiddenFlag">Hide</button>
                     <button type="Submit" class="button" @click="entryHideButtonClick(journalEntry.entry_id)" v-if="hiddenFlag">Unhide</button>
-                    <button type="Submit" class="button" @click="entryDeleteButtonClick(journalEntry.entry_id)" v-if="!deleteFlag">Delete</button>
+                    <button type="Submit" class="button" @click="entryDeleteButtonClick(journalEntry.entry_id)" v-if="!deleteBtnFlag">Delete</button>
                 </div>
             </div>
         </div>
@@ -304,10 +307,12 @@ Vue.component('journal-entry', {
             showJournalEntry: false, // Shows entry on journal entry click
             deleteFlag: false, // Whether the entry is delete or not, shows 'Delete' button if false
             activeJournal: '',
+            deleteBtnFlag: false
         }
     },
     created: function() {
         var that = this;
+        // Loads contents of the entry when journal entry is clicked
         Event.$on('journalEntryClick', function (journalId, id) {      
             axios.post('api/journalEntry', { journal_id: journalId, entry_id: id })
             .then(response => {
@@ -317,6 +322,7 @@ Vue.component('journal-entry', {
                 })
                 .catch(function (error) { console.log('fetch me -> ' + error.message) });
         })
+        // Loads contents of the version when a version is clicked
         Event.$on('entryVersionClick', function (journalId, entryId, id) {      
                 axios.post('api/version', { journal_id: journalId, entry_id: entryId, id: id })
                 .then(response => {
@@ -325,6 +331,7 @@ Vue.component('journal-entry', {
                 })
                 .catch(function (error) { console.log('fetch me -> ' + error.message) });
         })
+        // Loads contents of the entry in search result
         Event.$on('searchEntryClick', function (journalId, entryId, id) {      
                 axios.post('api/version', { journal_id: journalId, entry_id: entryId, id: id })
                 .then(response => {
@@ -335,16 +342,21 @@ Vue.component('journal-entry', {
                 that.hiddenFlag = true;
                 that.deleteFlag = true;
         })
+        // Hides journal entry wrapper when a journal entry isn't selected
         Event.$on('journalClick', function () {
             that.deleteFlag = false;
             that.hiddenFlag = false;
+            that.deleteBtnFlag = false;
             that.showJournalEntry = false;
         })
+        // If hidden tab is active, shows an unhide button and disables delete button
         Event.$on('hiddenIsActive', function () {
+            that.deleteBtnFlag = true;
             that.deleteFlag = false;
             that.hiddenFlag = true;
             that.showJournalEntry = false;
         })
+        // If delete tab is active, disables all buttons
         Event.$on('deletedIsActive', function () {
             that.deleteFlag = true;
             that.hiddenFlag = false;
@@ -361,17 +373,21 @@ Vue.component('journal-entry', {
             Event.$emit('journalEntryClick', activeJournal, journalEntryId);
         },
         entryDeleteButtonClick(journalEntryId) {
-            axios.post('api/deleteJournalEntry', { id: journalEntryId, journal_id: activeJournal })
-                .then(response => { })
-                .catch(function (error) { console.log('fetch me -> ' + error.message) });
-            Event.$emit('journalClick', activeJournal);
+            if (confirm("Would you like to delete this entry?") == true) {
+                axios.post('api/deleteJournalEntry', { id: journalEntryId, journal_id: activeJournal })
+                    .then(response => { })
+                    .catch(function (error) { console.log('fetch me -> ' + error.message) });
+                Event.$emit('journalClick', activeJournal);
+            }
             },
         entryHideButtonClick(journalEntryId) {
-            this.hiddenFlag = !this.hiddenFlag;
-            axios.post('api/toggleHideJournalEntry', {id: journalEntryId, journal_id: activeJournal})
-                .then(response => {})
-                .catch(function (error) { console.log('fetch me -> ' + error.message) });
-            Event.$emit('journalClick', activeJournal);      
+            if (confirm("Are you sure?") == true) {
+                this.hiddenFlag = !this.hiddenFlag;
+                axios.post('api/toggleHideJournalEntry', {id: journalEntryId, journal_id: activeJournal})
+                    .then(response => {})
+                    .catch(function (error) { console.log('fetch me -> ' + error.message) });
+                Event.$emit('journalClick', activeJournal);      
+            }
         }
     }
 })
@@ -404,10 +420,15 @@ Vue.component('versions', {
                 .then(response => { that.versions = response.data; that.showVersions = true })
                 .catch(function (error) { console.log('fetch me -> ' + error.message) });
         })
+        Event.$on('searchEntryClick', function (journalId, id) {  
+            axios.post('api/versions', { journal_id: journalId, entry_id: id })
+                .then(response => { that.versions = response.data; that.showVersions = true })
+                .catch(function (error) { console.log('fetch me -> ' + error.message) });
+        })
+        // Disables versions when journal is clicked, hidden is active
         Event.$on('journalClick', function () { that.showVersions = false })
-        Event.$on('hiddenIsActive', function () { that.showVersions = false })
-        Event.$on('deletedIsActive', function () { that.showVersions = false })
-        Event.$on('searchActive', function () { that.showVersions = false })
+        // Event.$on('hiddenIsActive', function () { that.showVersions = false })
+        // Event.$on('deletedIsActive', function () { that.showVersions = false })
     },
     methods: {
         onEntryVersionClick(entry_id, id) {
@@ -447,6 +468,7 @@ Vue.component('search', {
                 Close <i class="fa fa-times" aria-hidden="true"></i>
             </p>
             <p class="search-result-text" @click="active=false"> Search Results </p>
+            <p class="search-result-text" v-if="!journalEntries">No search results found.</p>
             <ul class="journal-entries-title">
                 <li v-for="(journalEntry, index) in journalEntries">
                     <a href="#" @click="onClickEntry(journalEntry.journal_id, journalEntry.entry_id, journalEntry.id)">
@@ -461,18 +483,18 @@ Vue.component('search', {
     `,
     data: function() {
         return {
-            searchTerm:'',
-            hiddenFlag: false,
-            deletedFlag: false,
-            date_from: '',
-            date_upto: '',
+            searchTerm: '', //Stores value of search term
+            hiddenFlag: false, //Stores value of hidden checkbox
+            deletedFlag: false, //Stores value of deleted checkbox
+            date_from: '', //Stores value of date from
+            date_upto: '', //Stores value of date upto
             name: '',
             journalEntries: {
-                title: '',
+                title: ''
             },
-            active: false,
-            filtersActive: false,
-            activeJournal: ''
+            active: false, //Stores whether the search is active or not
+            filtersActive: false, //Stores whether the filters are active or not
+            activeJournal: '' //Stores the id of the journal that is clicked in the search result
         }
     },
     created: function() {
@@ -482,6 +504,7 @@ Vue.component('search', {
                 .then(response => { that.versions = response.data; that.showVersions = true })
                 .catch(function (error) { console.log('fetch me -> ' + error.message) });
         }),
+        // Hides search result and filters when journal is clicked
         Event.$on('journalClick', function() {
             that.active = false;
             that.searchTerm = '';
@@ -493,12 +516,14 @@ Vue.component('search', {
         toggleFiltersActive: function () {
             this.filtersActive = !this.filtersActive
         },
+        // Hides filters and search results
         onCloseClick() {
             this.active = false;
             this.searchTerm = '';
             this.filtersActive = false;
             Event.$emit('journalClick');
         }, 
+        // Displays search results
         searchButtonClick() {
             this.active= true;
             Event.$emit('searchActive');
@@ -510,10 +535,12 @@ Vue.component('search', {
                 date_upto: this.date_upto,
             })
             .then(response => {
-                this.journalEntries = response.data
+                if (response.data.length == 0) this.journalEntries = null;
+                else this.journalEntries = response.data;
             })
             .catch(function (error) { console.log('fetch me -> ' + error.message) });
         },
+        // Displays the entry on the right hand pane when one of the search result is clicked
         onClickEntry(journal_id, entry_id, id) {
             Event.$emit('searchActive');
             Event.$emit('searchEntryClick', journal_id, entry_id, id);
@@ -523,7 +550,7 @@ Vue.component('search', {
 
 
 new Vue({
-    el: '#xyz',
+    el: '#app',
     data: {
     }
 })

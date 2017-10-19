@@ -6,7 +6,7 @@ $journals = Vue.component('journals', {
     <div>
         <div class="journal-heading-container">
             <p class="journal-heading">
-                JOURNALS
+                JOURNAL ENGINE
             </p>
             <a class="new-journal" @click = "toggle()"> New Journal <i class="fa fa-plus-circle" style="padding-left: 4px" aria-hidden="true"></i></a>
         </div>
@@ -231,12 +231,12 @@ Vue.component('deleted-entries', {
     template: `
     <div v-if="active">
         <ul class="journal-entries-title">
-                <li v-for="(journalEntry, index) in journalEntries">
-                    <a href="#" @click="onClickEntry(journalEntry.entry_id)">
-                        {{ journalEntry.title }}
-                        <p style="color: #AAA; font-size: 0.8rem; font-style:italic">Last updated at {{journalEntry.updated_at}}</p>
-                    </a>
-                </li>
+            <li v-for="(journalEntry, index) in journalEntries">
+                <a href="#" @click="onClickEntry(journalEntry.entry_id)">
+                    {{ journalEntry.title }}
+                    <p style="color: #AAA; font-size: 0.8rem; font-style:italic">Last updated at {{journalEntry.updated_at}}</p>
+                </a>
+            </li>
         </ul>
     </div>
     `,
